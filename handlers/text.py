@@ -8,6 +8,7 @@ from loguru import logger
 
 from database.models import update_user_activity, increment_message_count
 from utils.helpers import is_admin
+from utils.ai_services import ai_services
 
 
 async def handle_text_message(message: types.Message, state: FSMContext):
@@ -23,7 +24,7 @@ async def handle_text_message(message: types.Message, state: FSMContext):
         # Логируем сообщение
         logger.info(f"Сообщение от {message.from_user.full_name} (ID: {user_id}): {text}")
         
-        # Простая логика ответа
+        # Умная логика ответа с AI
         if "привет" in text.lower():
             response = f"Привет, {message.from_user.first_name}! 👋"
         elif "как дела" in text.lower():
@@ -42,15 +43,28 @@ async def handle_text_message(message: types.Message, state: FSMContext):
 /profile - Ваш профиль
 
 <b>Что я умею:</b>
-• Отвечать на сообщения
+• Отвечать на сообщения с помощью AI
 • Обрабатывать медиа-файлы
+• Анализировать изображения
 • Показывать статистику
 • Помогать администраторам
 
 Просто напишите мне что-нибудь, и я постараюсь помочь!
             """
         else:
-            response = f"""
+            # Используем AI для умного ответа
+            try:
+                ai_response = await ai_services.get_smart_response(text)
+                response = f"""
+🤖 <b>AI ответ:</b>
+{ai_response}
+
+💬 <b>Ваше сообщение:</b>
+"{text}"
+                """
+            except Exception as e:
+                logger.error(f"AI error: {e}")
+                response = f"""
 💬 <b>Получено ваше сообщение:</b>
 "{text}"
 
@@ -63,7 +77,7 @@ async def handle_text_message(message: types.Message, state: FSMContext):
 • Использовать кнопки меню
 
 Пишите, что угодно! 😊
-            """
+                """
         
         await message.answer(response)
         

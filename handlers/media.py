@@ -9,6 +9,7 @@ import os
 
 from database.models import update_user_activity
 from config import UPLOAD_PATH, ALLOWED_EXTENSIONS, MAX_FILE_SIZE
+from utils.ai_services import ai_services
 
 
 async def handle_photo(message: types.Message, state: FSMContext):
@@ -29,7 +30,36 @@ async def handle_photo(message: types.Message, state: FSMContext):
             await message.answer(f"⚠️ Файл слишком большой. Максимальный размер: {MAX_FILE_SIZE} MB")
             return
         
-        response = f"""
+        # Анализируем изображение с помощью AI
+        try:
+            # Получаем файл изображения
+            file = await message.bot.get_file(file_id)
+            file_data = await message.bot.download_file(file.file_path)
+            
+            # Анализируем с помощью Gemini
+            analysis = await ai_services.analyze_image_with_gemini(file_data.read())
+            
+            if analysis:
+                response = f"""
+📸 <b>Получено фото!</b>
+
+<b>Информация:</b>
+• Размер: {file_size or 'Неизвестно'} байт
+• ID файла: {file_id}
+• Отправитель: {message.from_user.full_name}
+
+🤖 <b>AI анализ:</b>
+{analysis}
+
+<b>Что я могу сделать:</b>
+• Сохранить фото
+• Обработать изображение
+• Отправить обратно
+
+Спасибо за фото! 😊
+                """
+            else:
+                response = f"""
 📸 <b>Получено фото!</b>
 
 <b>Информация:</b>
@@ -43,7 +73,24 @@ async def handle_photo(message: types.Message, state: FSMContext):
 • Отправить обратно
 
 Спасибо за фото! 😊
-        """
+                """
+        except Exception as e:
+            logger.error(f"Error analyzing image: {e}")
+            response = f"""
+📸 <b>Получено фото!</b>
+
+<b>Информация:</b>
+• Размер: {file_size or 'Неизвестно'} байт
+• ID файла: {file_id}
+• Отправитель: {message.from_user.full_name}
+
+<b>Что я могу сделать:</b>
+• Сохранить фото
+• Обработать изображение
+• Отправить обратно
+
+Спасибо за фото! 😊
+            """
         
         await message.answer(response)
         

@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Токен бота (получите у @BotFather)
-BOT_TOKEN = os.getenv("BOT_TOKEN", "YOUR_BOT_TOKEN_HERE")
+BOT_TOKEN = os.getenv("BOT_TOKEN", "8346223471:AAEurGYXT8Zq18khHdCiVgaV45iO2qGgo1w")
 
 # ID администраторов (замените на реальные ID)
 ADMIN_IDS = [
@@ -32,6 +32,14 @@ PROXY_URL = os.getenv("PROXY_URL", "")
 
 # Настройки Redis (для кэширования)
 REDIS_URL = os.getenv("REDIS_URL", "")
+
+# AI API ключи
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "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")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "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")
+
+# Настройки AI сервисов
+OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
 
 # Настройки файлов
 UPLOAD_PATH = os.getenv("UPLOAD_PATH", "uploads")
