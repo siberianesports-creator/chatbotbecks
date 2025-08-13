@@ -4,6 +4,9 @@ from dotenv import load_dotenv
 # Загружаем переменные окружения из .env файла
 load_dotenv()
 
+# Также загружаем из config.env в корневой директории
+load_dotenv("../config.env")
+
 # Токен бота (получите у @BotFather)
 BOT_TOKEN = os.getenv("BOT_TOKEN", "8346223471:AAEurGYXT8Zq18khHdCiVgaV45iO2qGgo1w")
 
